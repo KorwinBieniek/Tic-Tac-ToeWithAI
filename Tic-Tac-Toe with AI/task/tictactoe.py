@@ -1,5 +1,16 @@
+import random
+
+EMPTY_SYMBOL = ' '
+X_SYMBOL = 'X'
+O_SYMBOL = 'O'
+
+
 class AlreadyTakenSpotError(Exception):
     """Raised when one of the indexes is already taken"""
+    pass
+
+
+class Board:
     pass
 
 
@@ -15,14 +26,12 @@ def return_cells(board):
     return s
 
 
-def _create_board(cells):
+def _create_board():
     rows = []
-    x = 0
     for i in range(3):
         row = []
         for _ in range(3):
-            row.append(cells[x])
-            x += 1
+            row.append(' ')
         rows.append(row)
     return rows
 
@@ -39,7 +48,6 @@ def _verify_coordinates(board, player):
         try:
             row, col = list(
                 map(int, input('Enter the coordinates: ').split()))
-            print()
             fix_spot(board, player, row_index=row - 1, col_index=col - 1)
             break
         except AlreadyTakenSpotError:
@@ -99,27 +107,42 @@ def _check_diagonals(board, player, board_length):
     return False
 
 
-if __name__ == '__main__':
-    cells = list(input('Enter the cells: '))
-    for i, _ in enumerate(cells):
-        if cells[i] == '_':
-            cells[i] = ' '
-    from collections import Counter
+def computer_move(board):
+    print('Making move level "easy"')
+    while True:
+        row = random.randint(0, 2)
+        column = random.randint(0, 2)
+        if board[row][column] == ' ':
+            break
+    fix_spot(board, O_SYMBOL, row, column)
 
-    counter = Counter(cells)
-    player = 'X'
-    if counter['X'] <= counter['O']:
-        player = 'X'
-    else:
-        player = 'O'
-    # print(player)
-    board = _create_board(cells)
-    print(return_cells(board))
-    _verify_coordinates(board, player)
-    print(return_cells(board))
+
+def is_finished(board, player):
     if is_draw(board):
         print('Draw')
+        return True
     elif is_win(board, player):
         print(f'{player} wins')
-    else:
-        print('Game not finished')
+        return True
+    return False
+
+
+if __name__ == '__main__':
+    # cells = list(input('Enter the cells: '))
+    # for i, _ in enumerate(cells):
+    #     if cells[i] == '_':
+    #         cells[i] = ' '
+
+    player = 'X'
+
+    board = _create_board()
+    print(return_cells(board))
+    while True:
+        _verify_coordinates(board, player)
+        print(return_cells(board))
+        if is_finished(board, 'X'):
+            break
+        computer_move(board)
+        print(return_cells(board))
+        if is_finished(board, 'O'):
+            break
