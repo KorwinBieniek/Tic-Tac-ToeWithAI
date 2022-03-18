@@ -107,14 +107,14 @@ def _check_diagonals(board, player, board_length):
     return False
 
 
-def computer_move(board):
+def computer_move(board, player):
     print('Making move level "easy"')
     while True:
         row = random.randint(0, 2)
         column = random.randint(0, 2)
         if board[row][column] == ' ':
             break
-    fix_spot(board, O_SYMBOL, row, column)
+    fix_spot(board, player, row, column)
 
 
 def is_finished(board, player):
@@ -127,22 +127,62 @@ def is_finished(board, player):
     return False
 
 
-if __name__ == '__main__':
-    # cells = list(input('Enter the cells: '))
-    # for i, _ in enumerate(cells):
-    #     if cells[i] == '_':
-    #         cells[i] = ' '
+def game_mode():
+    player_one = 0
+    player_two = 0
+    while True:
+        if player_one != 0 and player_two != 0:
+            return player_one, player_two
+        game_type = input('Input command: > ').split()
+        if game_type[0] == 'start':
+            try:
+                if game_type[1] == 'user' and game_type[2] == 'user':
+                    player_one = player_two = 1
+                elif game_type[1] == 'easy' and game_type[2] == 'user':
+                    player_one = 2
+                    player_two = 1
+                elif game_type[1] == 'user' and game_type[2] == 'easy':
+                    player_one = 1
+                    player_two = 2
+                elif game_type[1] == 'easy' and game_type[2] == 'easy':
+                    player_one = player_two = 2
+            except IndexError:
+                print('Bad parameters!')
+                continue
+        elif game_type[0] == 'exit':
+            exit(0)
+        else:
+            print('Bad parameters!')
+            continue
 
-    player = 'X'
 
+def main():
+    pl_one, pl_two = game_mode()
     board = _create_board()
     print(return_cells(board))
+
     while True:
-        _verify_coordinates(board, player)
+
+        player = X_SYMBOL
+        if pl_one == 1:
+            _verify_coordinates(board, player)
+        elif pl_one == 2:
+            computer_move(board, player)
+
         print(return_cells(board))
         if is_finished(board, 'X'):
             break
-        computer_move(board)
+
+        player = O_SYMBOL
+        if pl_two == 1:
+            _verify_coordinates(board, player)
+        elif pl_two == 2:
+            computer_move(board, player)
+
         print(return_cells(board))
         if is_finished(board, 'O'):
             break
+
+
+if __name__ == '__main__':
+    main()
