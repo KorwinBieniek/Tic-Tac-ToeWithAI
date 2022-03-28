@@ -107,7 +107,7 @@ def _check_diagonals(board, player, board_length):
     return False
 
 
-def computer_move(board, player):
+def computer_easy(board, player):
     print('Making move level "easy"')
     while True:
         row = random.randint(0, 2)
@@ -115,6 +115,38 @@ def computer_move(board, player):
         if board[row][column] == ' ':
             break
     fix_spot(board, player, row, column)
+
+
+def computer_medium(board, player):
+    places = [(0, 0), (0, 1), (0, 2),
+              (1, 0), (1, 1), (1, 2),
+              (2, 0), (2, 1), (2, 2)]
+    print('Making move level "medium"')
+    for place in places:
+        if board[place[0]][place[1]] == ' ':
+            fix_spot(board, O_SYMBOL, place[0], place[1])
+            flag = is_win(board, O_SYMBOL)
+            if flag:
+                # print('I see enemy win')
+                board[place[0]][place[1]] = ' '
+                return (place[0], place[1])
+            else:
+                board[place[0]][place[1]] = ' '
+
+            fix_spot(board, X_SYMBOL, place[0], place[1])
+            flag = is_win(board, X_SYMBOL)
+            if flag:
+                # print('I see my win')
+                board[place[0]][place[1]] = ' '
+                return (place[0], place[1])
+            else:
+                board[place[0]][place[1]] = ' '
+    # print('I go random')
+    while True:
+        row = random.randint(0, 2)
+        column = random.randint(0, 2)
+        if board[row][column] == ' ':
+            return (row, column)
 
 
 def is_finished(board, player):
@@ -136,16 +168,18 @@ def game_mode():
         game_type = input('Input command: > ').split()
         if game_type[0] == 'start':
             try:
-                if game_type[1] == 'user' and game_type[2] == 'user':
-                    player_one = player_two = 1
-                elif game_type[1] == 'easy' and game_type[2] == 'user':
-                    player_one = 2
-                    player_two = 1
-                elif game_type[1] == 'user' and game_type[2] == 'easy':
+                if game_type[1] == 'user':
                     player_one = 1
+                elif game_type[1] == 'easy':
+                    player_one = 2
+                elif game_type[1] == 'medium':
+                    player_one = 3
+                if game_type[2] == 'user':
+                    player_two = 1
+                elif game_type[2] == 'easy':
                     player_two = 2
-                elif game_type[1] == 'easy' and game_type[2] == 'easy':
-                    player_one = player_two = 2
+                elif game_type[2] == 'medium':
+                    player_two = 3
             except IndexError:
                 print('Bad parameters!')
                 continue
@@ -167,7 +201,10 @@ def main():
         if pl_one == 1:
             _verify_coordinates(board, player)
         elif pl_one == 2:
-            computer_move(board, player)
+            computer_easy(board, player)
+        elif pl_one == 3:
+            row, col = computer_medium(board, player)
+            fix_spot(board, player, row, col)
 
         print(return_cells(board))
         if is_finished(board, 'X'):
@@ -177,7 +214,10 @@ def main():
         if pl_two == 1:
             _verify_coordinates(board, player)
         elif pl_two == 2:
-            computer_move(board, player)
+            computer_easy(board, player)
+        elif pl_two == 3:
+            row, col = computer_medium(board, player)
+            fix_spot(board, player, row, col)
 
         print(return_cells(board))
         if is_finished(board, 'O'):
